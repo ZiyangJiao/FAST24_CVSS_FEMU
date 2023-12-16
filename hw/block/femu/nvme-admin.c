@@ -720,8 +720,8 @@ static uint16_t nvme_smart_info(FemuCtrl *n, NvmeCmd *cmd, uint32_t buf_len)
     }
 //    printf("Util: %llu!\n", util);
 //    printf("Call SMART on %s\n", n->ssd->ssdname);
-    char path2wa[80] = "/media/tmp_sdc/femu/build-femu/wa.log.";
-    char path2ec[80] = "/media/tmp_sdc/femu/build-femu/ec.log.";
+    char path2wa[80] = "wa.log.";
+    char path2ec[80] = "ec.log.";
     strcat(path2wa, n->ssd->ssdname);
     strcat(path2ec, n->ssd->ssdname);
     fp_wa = fopen(path2wa, "a+");
