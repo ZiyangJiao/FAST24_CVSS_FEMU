@@ -680,7 +680,7 @@ static uint64_t ssd_gc_read(struct ssd *ssd, struct ppa *ppa, struct nand_cmd *n
         // printf("READ0: is aged\n");
         struct line_mgmt *lm = &ssd->lm;
         struct ppa ppa_tmp;
-        uint64_t line_cur_read = 0, line_read = 0;
+        uint64_t line_cur_read = 0, line_read = 0, line_max_read = 0;
         int line_read_min_id = -1;
         int line_read_min_ec = -1;
         int i, ch, lun;
@@ -695,6 +695,9 @@ static uint64_t ssd_gc_read(struct ssd *ssd, struct ppa *ppa, struct nand_cmd *n
             struct line *line = &lm->lines[i];
             blk_tmp = get_blk(ssd, &ppa_tmp);
             line_read = line->read_cnt;
+            if (line_read > line_max_read) {
+            	line_max_read = line_read;
+            }
             // printf("READ0: get line read\n");
             // for (ch = 0; ch < spp->nchs; ch++) {
             //     ppa_tmp.g.ch = ch;
@@ -731,7 +734,7 @@ static uint64_t ssd_gc_read(struct ssd *ssd, struct ppa *ppa, struct nand_cmd *n
         // printf("READ1: line_cur_read = %ld, line_avg_read %ld, line_read_min_ec %d\n", line_cur_read, line_avg_read, line_read_min_ec);
 
         // check if target is a read-heavy (super)block
-        if (line_cur_read > line_avg_read && line_read_min_id != -1) {
+        if (line_cur_read > line_avg_read && line_cur_read > 0.3*line_max_read && line_read_min_id != -1) {
             //check benefit
             // printf("READ2: check benefit\n");
             if (swap_is_benefit(blk->erase_cnt, line_read_min_ec, spp)) {
