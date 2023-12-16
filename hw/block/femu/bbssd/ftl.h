@@ -52,6 +52,7 @@ enum {
 
     FEMU_RESET_STATE = 8,
     FEMU_FAST_AGING = 9,
+    FEMU_SET_DEGRADE = 10,
 };
 
 
@@ -289,3 +290,4 @@ void ssd_init(FemuCtrl *n);
 #endif
 
 #endif
+

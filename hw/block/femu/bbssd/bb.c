@@ -74,7 +74,7 @@ static void bb_flip(FemuCtrl *n, NvmeCmd *cmd)
     case FEMU_RESET_STATE:
         (n->ssd->sp).wl = (int)cdw11; // 0 - CV enabled; 1 - conventional SSD mode
         (n->ssd->sp).acceleration = (int)cdw12; // acceleration factor control for FF-SSD
-        if ((int)cdw13 >0) {
+        if ((int)cdw13 > 0) {
             (n->ssd->sp).retired_ec = (int)cdw13; // set the host requirement for mapping-out threshold
             printf("FEMU:%s,The block retirement threshold is updated to (%lu)\n", n->devname, cdw13);
         }
@@ -93,6 +93,15 @@ static void bb_flip(FemuCtrl *n, NvmeCmd *cmd)
             (n->ssd->sp).pg_rd_lat = NAND_READ_LATENCY;
             (n->ssd->sp).pg_wr_lat = NAND_PROG_LATENCY;
             (n->ssd->sp).blk_er_lat = NAND_ERASE_LATENCY;
+        }
+        break;
+    case FEMU_SET_DEGRADE:
+        if ((int)cdw11 == 1) {
+            n->ssd->cv_moderate = 1;
+            printf("FEMU:%s,CV_degraded mode is set.\n", n->devname);
+        } else {
+            n->ssd->cv_moderate = 0;
+            printf("FEMU:%s,CV_degraded mode is unset.\n", n->devname);
         }
         break;
     default:
@@ -144,4 +153,5 @@ int nvme_register_bbssd(FemuCtrl *n)
 
     return 0;
 }
+
 
