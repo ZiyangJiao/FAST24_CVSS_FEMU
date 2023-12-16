@@ -1241,7 +1241,7 @@ static struct line *select_victim_line(struct ssd *ssd, bool force)
     }
 
     if ((ssd->cv_moderate == 0) && (lm->bad_line_cnt > 0) && (victim_line->vpc > ssd->sp.pgs_per_line / 2)){ // If WAF is high, we should turn on CV-moderate to slow capacity loss.
-        // ssd->cv_moderate = 1;
+        ssd->cv_moderate = 1;
     }
 gotit: ;
     pqueue_remove(lm->victim_line_pq, victim_line);
@@ -1378,9 +1378,9 @@ static int do_gc(struct ssd *ssd, bool force)
                 util += line->vpc;
             }
             util = util/((lm->tt_lines - lm->bad_line_cnt)*ssd->sp.pgs_per_line);
-            // if (util > 0.75) {
-            if (util > 0.8) {
-                // ssd->cv_moderate = 1;
+            if (util > 0.75) {
+            //if (util > 0.8) {
+                ssd->cv_moderate = 1;
             }
         }
     } else {
