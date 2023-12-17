@@ -1170,18 +1170,19 @@ static struct line *select_victim_line(struct ssd *ssd, bool force)
             ppa.g.pl = 0;
             ppa.g.blk = victim_line->id;
             struct nand_block *block_victim = get_blk(ssd, &ppa);
-            // line_score = victim_line->ipc/spp->pgs_per_line*0.1 + 0.8*block_victim->erase_cnt/spp->endurance;
+            // line_score = victim_line->ipc/spp->pgs_per_line*0.4 + 0.3*block_victim->erase_cnt/spp->endurance;
             for (int i = 1; i < lm->victim_line_cnt; i++) {
                 line = lm->victim_line_pq->d[i + 1]; // d[1] is the result of peek(), we check the rest.
                 ppa.g.blk = line->id;
                 block_tmp = get_blk(ssd, &ppa);
                 total_vpc += line->vpc;
 
-                // line_score_tmp = line->ipc/spp->pgs_per_line*0.1 + 0.8*block_tmp->erase_cnt/spp->endurance;
-                // if (line_score_tmp > line_score) {
+                // line_score_tmp = line->ipc/spp->pgs_per_line*0.4 + 0.3*block_tmp->erase_cnt/spp->endurance;
+                // if (line_score_tmp > line_score && line->vpc < ssd->sp.pgs_per_line / 8) {
                 //     victim_line = line;
                 //     block_victim = block_tmp;
                 //     line_score = line_score_tmp;
+                //	continue;
                 // }
                 // /***
                 if (line->vpc > victim_line->vpc) {
