@@ -17,7 +17,7 @@ Contact: Ziyang Jiao (zjiao04@syr.edu), Xiangqun Zhang (xzhang84@syr.edu)
 
 ## 1. Hardware requirements
 
-The evaluation requires the following hardware specifications:
+Please make sure you have at least 160 GiB memory and 150 GiB free space on your disk if testing on your own machine. Our evaluation is based on the following hardware specifications:
 
 | **Hardware** | **Specification**                  |
 |---------------|------------------------------------|
