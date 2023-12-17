@@ -2,7 +2,7 @@
 Thank you for your time on evaluating our artifact. Here are the steps for setting up the FEMU for CVSSD.
 
 ## Title: The Design and Implementation of a Capacity-Variant Storage System
-Contact: Ziyang Jiao (zjiao04@syr.edu), Xiangqun Zhang (xiangq84@syr.edu)
+Contact: Ziyang Jiao (zjiao04@syr.edu), Xiangqun Zhang (xzhang84@syr.edu)
 
 ## Contents
 - [1. Hardware requirements](#1-hardware-requirements)
@@ -49,7 +49,7 @@ cp ../femu-scripts/femu-copy-scripts.sh ./
 
 You can either build your own VM image, or use the VM image provided by us
 
-**Option 1**: This is the **recommended** way to get CV-SSD running quickly - Use our VM image file. To obtain the VM image, you can contact Ziyang Jiao, Email: ``zjiao04@syr.edu`` or Xiangqun Zhang, Email: ``xiangq84@syr.edu``. The VM image downloading instructions will be sent to your email address.
+**Option 1**: This is the **recommended** way to get CV-SSD running quickly - Use our VM image file. To obtain the VM image, you can contact Ziyang Jiao, Email: ``zjiao04@syr.edu`` or Xiangqun Zhang, Email: ``xzhang84@syr.edu``. The VM image downloading instructions will be sent to your email address.
 
 **Option 2**: To build your own VM image, please refer to the [FEMU instructions](https://github.com/vtess/FEMU).
 
