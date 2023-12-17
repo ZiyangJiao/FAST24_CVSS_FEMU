@@ -12,7 +12,7 @@ Contact: Ziyang Jiao (zjiao04@syr.edu), Xiangqun Zhang (xiangq84@syr.edu)
 - [5. Starting the virtual machine](#5-starting-the-virtual-machine)
 - [6. Connecting into the virtual machine](#6-connecting-into-the-virtual-machine)
 - [7. Setting up CV-SSD](#7-setting-up-cv-ssd)
-- [8. FIO experiments on CVSSD](#8-fio-experiments-on-cvssd-without-logical-capacity-adjustment)
+- [8. FIO experiments on CV-SSD](#8-fio-experiments-on-cv-ssd-without-logical-capacity-adjustment)
 - [9. FIO experiments on CVSS (CV-FS+CV-SSD+CV-Manager)](#9-fio-experiments-on-cvss-cv-fscv-ssdcv-manager)
 
 ## 1. Hardware requirements
@@ -97,7 +97,7 @@ We use fio as an example here to test the functionality of CV-SSD:
     ```
 This new `nvme-cli` command enbales the CV-SSD mode, where `cdw12` is used to adjust the acceleration factor for aging, and `cdw13` is used to update the threshold to determine retired blocks. A lower value makes the blocks retire earlier and thus causes a shorter device lifetime and higher device reliability. The CV-SSD will use the default threshold and ignore this field if `cdw13=0x00`.
 
-## 8. FIO experiments on CVSSD (Without logical capacity adjustment)
+## 8. FIO experiments on CV-SSD (Without logical capacity adjustment)
 
 - To run FIO directly:
     ```bash
