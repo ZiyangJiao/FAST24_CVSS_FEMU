@@ -4,11 +4,11 @@
 # 7.37% OP 128GiB physical, 128GB(119.2GiB) logical, 122070mib
 
 # image directory
-IMGDIR=/media/tmp_sdc/images
+IMGDIR=/media/tmp_nvme4
 # IMGDIR=/media/tmp_sdc/images_remap
 # IMGDIR=/media/tmp_sdc/images_docker
 # Virtual machine disk image
-OSIMGF=$IMGDIR/u20s.qcow2
+OSIMGF=$IMGDIR/u20s.qcow2.FAST24AE
 sudo rm wa.log.vSSD0
 sudo rm ec.log.vSSD0
 
