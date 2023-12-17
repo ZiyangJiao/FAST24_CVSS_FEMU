@@ -5,6 +5,7 @@
 *.o
 *.ko
 *.obj
+build-femu/*
 
 # Linker output
 *.ilk
