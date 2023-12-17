@@ -29,7 +29,9 @@ The evaluation requires the following hardware specifications:
 ## 2. Downloading the repository
 
 To clone the code, please run the following command:
-`git clone https://github.com/ZiyangJiao/FAST24_CVSS_FEMU.git`
+```bash
+git clone https://github.com/ZiyangJiao/FAST24_CVSS_FEMU.git
+```
 
 ## 3. Compilation
 
