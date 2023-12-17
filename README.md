@@ -1,281 +1,189 @@
-[![FEMU Version](https://img.shields.io/badge/FEMU-v5.2-brightgreen)](https://img.shields.io/badge/FEMU-v5.2-brightgreen)
-[![Build Status](https://travis-ci.com/ucare-uchicago/FEMU.svg?branch=master)](https://travis-ci.com/ucare-uchicago/FEMU)
-[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Platform](https://img.shields.io/badge/Platform-x86--64-brightgreen)](https://shields.io/)
+# FAST ’24 Artifacts Evaluation
+Thank you for your time on evaluating our artifact. Here are the steps for setting up the FEMU for CVSSD.
 
-```
-  ______ ______ __  __ _    _ 
- |  ____|  ____|  \/  | |  | |
- | |__  | |__  | \  / | |  | |
- |  __| |  __| | |\/| | |  | |
- | |    | |____| |  | | |__| |
- |_|    |______|_|  |_|\____/  -- A QEMU-based and DRAM-backed NVMe SSD Emulator
+## Title: The Design and Implementation of a Capacity-Variant Storage System
+Contact: Ziyang Jiao (zjiao04@syr.edu), Xiangqun Zhang (xiangq84@syr.edu)
 
-```
-                              
-Contact Information
---------------------
+## Contents
+- [1. Hardware requirements](#1-hardware-requirements)
+- [2. Downloading the repository](#2-downloading-the-repository)
+- [3. Compilation](#3-compilation)
+- [4. Preparing the VM image (skip for AE)](#4-preparing-the-vm-image-skip-for-artifact-evaluation-committe)
+- [5. Starting the virtual machine](#5-starting-the-virtual-machine)
+- [6. Connecting into the virtual machine](#6-connecting-into-the-virtual-machine)
+- [7. Setting up CV-SSDCV-SSD](#7-setting-up-cv-ssd)
+- [8. FIO experiments on CVSSD](#8-fio-experiments-on-cvssd-without-logical-capacity-adjustment)
+- [9. FIO experiments on CVSS (CV-FS+CV-SSD+CV-Manager)](#9-fio-experiments-on-cvss-cv-fscv-ssdcv-manager)
 
-**Maintainer**: [Huaicheng Li](https://people.cs.uchicago.edu/~huaicheng/) (huaicheng@cs.uchicago.edu)
+## 1. Hardware requirements
 
-Please do not hesitate to contact Huaicheng for any suggestions/feedback, bug
-reports, or general discussions.
+The evaluation requires the following hardware specifications:
 
-Please consider citing our FEMU paper at FAST 2018 if you use FEMU. The bib
-entry is
+| **Hardware** | **Specification**                  |
+|---------------|------------------------------------|
+| Processor     | Intel(R) Xeon(R) Silver 4208 CPU @ 2.10GHz, 32-Core |
+| Architecture  | x86_64                        |
+| Memory        | DDR4 2666 MHz, 1 TiB (64 GB x16)  |
+| OS            | Ubuntu 20.04.6 LTS (kernel 5.15.0-86-generic)|
 
-```
-@InProceedings{Li+18-FEMU, 
-Author = {Huaicheng Li and Mingzhe Hao and Michael Hao Tong 
-and Swaminathan Sundararaman and Matias Bj{\o}rling and Haryadi S. Gunawi},
-Title = "The CASE of FEMU: Cheap, Accurate, Scalable and Extensible Flash Emulator",
-Booktitle =  {Proceedings of 16th USENIX Conference on File and Storage Technologies (FAST)},
-Address = {Oakland, CA},
-Month =  {February},
-Year =  {2018}
-}
+## 2. Downloading the repository
 
-```
+To clone the code, please run the following command:
+`git clone https://github.com/ZiyangJiao/FAST24_CVSS_FEMU.git`
 
-Project Description (What is FEMU?)
------------------------------------
+## 3. Compilation
 
-
-                            +--------------------+
-                            |    VM / Guest OS   |
-                            |                    |
-                            |                    |
-                            |  NVMe Block Device |
-                            +--------^^----------+
-                                     ||
-                                  PCIe/NVMe
-                                     ||
-      +------------------------------vv----------------------------+
-      |  +---------+ +---------+ +---------+ +---------+ +------+  |
-      |  | Blackbox| |  OCSSD  | | ZNS-SSD | |  NoSSD  | | ...  |  |
-      |  +---------+ +---------+ +---------+ +---------+ +------+  |
-      |                    FEMU NVMe SSD Controller                |
-      +------------------------------------------------------------+
-
-
-Briefly speaking, FEMU is a **fast**, **accurate**, **scalable**, and
-**extensible** NVMe SSD Emulator. Based upon QEMU/KVM, FEMU is exposed to Guest
-OS (Linux) as an NVMe block device (e.g. /dev/nvme0nX). It supports emulating different types of SSDs:
-
-- ``Whitebox mode`` (``OCSSD``) (a.k.a. Software-Defined Flash (SDF), or
-  OpenChannel-SSD) with host side FTL (e.g. LightNVM or SPDK FTL), both
-  OpenChannel Spec 1.2 and 2.0 are supported.
-
-- ``Blackbox mode`` (``BBSSD``) with FTL managed by the device (like most of
-  current commercial SSDs). A page-level mapping based FTL is included.
-
-- ``ZNS mode`` (``ZNSSD``), exposing NVMe Zone interface for the host to
-  directly read/write/append to the device following certain rules.
-
-- ``NoSSD mode``, emulating a as-fast-as-possible NVMe device with sub-10
-  microsecond latency. This is to emualte SCM-class block devices such as
-  Optane or Z-NAND SSDs.
-
-
-FEMU design aims to achieve the benefits of both SSD Hardware platforms (e.g.
-CNEX OpenChannel SSD, OpenSSD, etc.) and SSD simulators (e.g. DiskSim+SSD,
-FlashSim, SSDSim, etc.). Like hardware platforms, FEMU can support running full
-system stack (Applications + OS + NVMe interface) on top, thus enabling
-Software-Defined Flash (SDF) alike research with modifications at application,
-OS, interface or SSD controller architecture level. Like SSD simulators, FEMU
-can also support internal-SSD/FTL related research. Users can feel free to
-experiment with new FTL algorithms or SSD performance models to explore new SSD
-architecture innovations as well as benchmark the new arch changes with real
-applications, instead of using decade-old disk trace files.
-
-
-Installation
-------------
-
-1. Make sure you have installed necessary libraries for building QEMU. The
-   dependencies can be installed by following instructions below:
-
+To compile the code, please run the following commands after cloning the repository:
 ```bash
-  git clone https://github.com/ucare-uchicago/femu.git
-  cd femu
-  mkdir build-femu
-  # Switch to the FEMU building directory
-  cd build-femu
-  # Copy femu script
-  cp ../femu-scripts/femu-copy-scripts.sh .
-  ./femu-copy-scripts.sh .
-  # only Debian/Ubuntu based distributions supported
-  sudo ./pkgdep.sh
+cd FAST24_CVSS_FEMU
+mkdir build-femu
+cd build-femu
+cp ../femu-scripts/femu-copy-scripts.sh ./
+./femu-copy-scripts.sh ./
+./femu-compile.sh
 ```
 
-2. Compile & Install FEMU:
+## 4. Preparing the VM image (skip for artifact evaluation committe)
 
-```bash
-  ./femu-compile.sh
-```
-  FEMU binary will appear as ``x86_64-softmmu/qemu-system-x86_64``
+You can either build your own VM image, or use the VM image provided by us
 
-  **Tested host environment** (For successful FEMU compilation):
-  
-  | Linux Distribution   | Kernel | Gcc   | Ninja  | Python |
-  | :---                 | :---:  | ---   | ---    | ---    |
-  | Gentoo               | 5.10   | 9.3.0 | 1.10.1 | 3.7.9  |
-  | Ubuntu 16.04.5       | 4.15.0 | 5.4.0 | 1.8.2  | 3.6.0  |
-  | Ubuntu 20.04.1       | 5.4.0  | 9.3.0 | 1.10.0 | 3.8.2  | 
+**Option 1**: This is the **recommended** way to get CV-SSD running quickly - Use our VM image file. To obtain the VM image, you can contact Ziyang Jiao, Email: ``zjiao04@syr.edu`` or Xiangqun Zhang, Email: ``xiangq84@syr.edu``. The VM image downloading instructions will be sent to your email address.
 
-  **Tested VM environment** (Whether a certain FEMU mode works under a certain
-  guest kernel version): 
+**Option 2**: To build your own VM image, please refer to the [FEMU instructions](https://github.com/vtess/FEMU).
 
-  | Mode \ Guest Kernel       | 4.16    | 4.20    | 5.4     | 5.10    |
-  | :---                      | :---:   | --      | --      | --      |
-  | NoSSD                     | &check; | &check; | &check; | &check; |
-  | Black-box SSD             | &check; | &check; | &check; | &check; |
-  | OpenChannel-SSD v1.2      | &check; | &check; | &check; | &check; |
-  | OpenChannel-SSD v2.0      | &cross; | &check; | &check; | &check; |
-  | Zoned-Namespace (ZNS) SSD | &cross; | &cross; | &cross; | &check; |
+## 5. Starting the virtual machine
 
+To start the virtual machine, please run:
+`./run-blackbox.sh`
 
-> Notes: FEMU is now re-based on QEMU-5.2.0, which requires >=Python-3.6 and >=Ninjia-1.7 to build, 
-> check [here](https://wiki.qemu.org/ChangeLog/5.2#Build_Dependencies) for installing
-> these dependencies if ``pkgdep.sh`` doesn't solve all the requirements.)
+This will start the virtual machine (based on QEMU). You can set the path to your VM image via `IMGDIR=/` in the script.
 
+## 6. Connecting into the virtual machine
 
-3. Prepare the VM image (For performance reasons, we suggest to use a server
-   version guest OS [e.g. Ubuntu Server 20.04, 18.04, 16.04])
+Although the terminal shows an operable console for the virtual machine, it has some limitations. For example, there are no highlights for the terminal. Using Ctrl-C could terminate the virtual machine directly instead of terminating the process running under the virtual machine. Therefore, we have an extra SSH port to connect to the virtual machine for better usability. 
 
-  You can either build your own VM image, or use the VM image provided by us
+To connect to the virtual machine, please run:
+`ssh femu@localhost -p 8080`
 
-  **Option 1**: Use our VM image file, please download it from our
-  [FEMU-VM-image-site](https://forms.gle/nEZaEe2fkj5B1bxt9). After you fill in
-  the form, VM image downloading instructions will be sent to your email
-  address shortly.
+If there is a prompt for the password, simply use _femu_ as password.
 
-  **Option 2**: Build your own VM image by following guides (e.g.
-  [here](https://help.ubuntu.com/community/Installation/QemuEmulator#Installation_of_an_operating_system_from_ISO_to_the_QEMU_environment)).
-  After the guest OS is installed, make following changes to redirect VM output
-  to the console, instead of using a separate GUI window. (**Desktop version
-  guest OS is not tested**)
+## 7. Setting up CV-SSD
 
-   - Inside your guest Ubuntu server, edit `/etc/default/grub`, make sure the
-     following options are set.
+We use fio as an example here to test the functionality of CV-SSD:
 
-```
-GRUB_CMDLINE_LINUX="ip=dhcp console=ttyS0,115200 console=tty console=ttyS0"
-GRUB_TERMINAL=serial
-GRUB_SERIAL_COMMAND="serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1"
-```
+- First, we check the status of the emulated deivce (/dev/nvme0n1) by issuing lsblk command. We should find the emulated deivce with ~120GiB capacity as below.
 
-   - Still in the VM, update the grub
-   
-```
-$ sudo update-grub
-```
-  
-  Now you're ready to `Run FEMU`. If you stick to a Desktop version guest OS,
-  please remove "-nographics" command option from the running script before
-  running FEMU.
+    ```bash
+    femu@fvm:~$ lsblk 
+    NAME    MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+    fd0       2:0    1     4K  0 disk 
+    loop0     7:0    0  55.7M  1 loop /snap/core18/2785
+    loop1     7:1    0  63.5M  1 loop /snap/core20/2015
+    loop2     7:2    0  40.9M  1 loop /snap/snapd/19993
+    loop3     7:3    0  55.7M  1 loop /snap/core18/2790
+    loop4     7:4    0  91.9M  1 loop /snap/lxd/24061
+    loop6     7:6    0  91.8M  1 loop /snap/lxd/23991
+    loop7     7:7    0  40.9M  1 loop /snap/snapd/20290
+    loop8     7:8    0  63.9M  1 loop /snap/core20/2105
+    sda       8:0    0    80G  0 disk 
+    ├─sda1    8:1    0     1M  0 part 
+    └─sda2    8:2    0    80G  0 part /
+    nvme0n1 259:0    0 119.2G  0 disk 
+    ```
 
- 
- 4. Login to FEMU VM
+- Second, we initiate the capacity-variant mode and disable WL in the deivice.
+    ```bash
+    sudo nvme admin-passthru /dev/nvme0n1 --opcode=0xef --cdw10=0x0008 --cdw11=0x00 --cdw12=0x02 --cdw13=0x00 -r -b
+    ```
+This new `nvme-cli` command enbales the CV-SSD mode, where `cdw12` is used to adjust the acceleration factor for aging, and `cdw13` is used to update the threshold to determine retired blocks. A lower value makes the blocks retire earlier and thus causes a shorter device lifetime and higher device reliability. The CV-SSD will use the default threshold and ignore this field if `cdw13=0x00`.
 
-  - If you correctly setup the aforementioned configurations, you should be
-    able to see **text-based** VM login in the same terminal where you issue
-    the running scripts.
-  - Or, more conveniently, FEMU running script has mapped host port `8080` to
-    guest VM port `22`, thus, after you install and run `openssh-server` inside
-    the VM, you can also ssh into the VM via below command line. (Please run it
-    from your host machine)
-  
-  ```
-  $ ssh -p8080 $user@localhost
-  ```
+## 8. FIO experiments on CVSSD (Without logical capacity adjustment)
 
-Run FEMU
---------
+- To run FIO directly:
+    ```bash
+    sudo fio --randrepeat=1 --ioengine=libaio --direct=1 --name=test --bs=16k --iodepth=128 --readwrite=randwrite  --size=10G --filename=/dev/nvme0n1
+    ```
+This example issues 10GiB random write to the CV-SSD (`/dev/nvme0n1`). The detailed usage of FIO can be found on https://fio.readthedocs.io/en/latest/fio_doc.html.
 
+- We can manually set and unset the degraded mode for CV-SSD. This mode updates the block management policies in CV-SSD.
+- To set: 
+    ```bash
+    sudo nvme admin-passthru /dev/nvme0n1 --opcode=0xef --cdw10=0x0A --cdw11=0x01 -r -b
+    ```
+- To unset: 
+    ```bash
+    sudo nvme admin-passthru /dev/nvme0n1 --opcode=0xef --cdw10=0x0A --cdw11=0x00 -r -b
+    ```
 
-### 0. Minimum Requirement
+This part tests the funtionality of CV-SSD and our hardware emulation platform. The CV-SSD exports a fixed logical capacity without the capacity variance feature since CV-FS and CV-Manager was not enabled.
+To enable capacity variance, please refer to the following section.
 
-- Run FEMU on a physical machine, not inside a VM (if the VM has nested
-  virtualization enabled, you can also give it a try, but FEMU performance will
-  suffer, this is **not** recommended.)
+## 9. FIO experiments on CVSS (CV-FS+CV-SSD+CV-Manager)
 
-- At least 8 cores and 12GB DRAM in the physical machine to enable seamless run
-  of the following default FEMU scripts emulating a 4GB SSD in a VM with 4
-  vCPUs and 4GB DRAM.
+We now test the functionality of CV-FS:
 
-- If you intend to emulate a larger VM (more vCPUs and DRAM) and an SSD with
-  larger capacity, make sure refer to the resource provisioning tips
-  [here](https://github.com/ucare-uchicago/FEMU/wiki/Before-running-FEMU).
+- First, the CV-FS code can be found under the directory `/home/femu/linux-5.15.0-76-generic-f2fs`.
+- Second _(optional)_, we can complie CV-FS using the run.sh script under this directory. This step can be skipped since the provided image has done it.
+`sudo ./run.sh`
+- Third, we build CV-FS on CV-SSD. This can be done by running:
+`diskcvfs`
+This command will build the file system and mount the CV-SSD on the path `/mnt/nvme0n1`. It also create directories for the experiments.
+- Fourth, we can check the status of the system using `lsblk`. We should find the device is mounted successfully and ready to use. Below is an example:
 
-### 1. Run FEMU as blackbox SSDs (``Device-managed FTL`` or ``BBSSD`` mode) ###
+    ```bash
+    femu@fvm:/mnt/nvme0n1$ lsblk
+    NAME    MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+    fd0       2:0    1     4K  0 disk 
+    loop0     7:0    0  55.7M  1 loop /snap/core18/2785
+    loop1     7:1    0  63.5M  1 loop /snap/core20/2015
+    loop2     7:2    0  40.9M  1 loop /snap/snapd/19993
+    loop3     7:3    0  55.7M  1 loop /snap/core18/2790
+    loop4     7:4    0  91.9M  1 loop /snap/lxd/24061
+    loop6     7:6    0  91.8M  1 loop /snap/lxd/23991
+    loop7     7:7    0  40.9M  1 loop /snap/snapd/20290
+    loop8     7:8    0  63.9M  1 loop /snap/core20/2105
+    sda       8:0    0    80G  0 disk 
+    ├─sda1    8:1    0     1M  0 part 
+    └─sda2    8:2    0    80G  0 part /
+    nvme0n1 259:0    0 119.2G  0 disk /mnt/nvme0n1
+    ```
 
-**TODO:** currently blackbox SSD parameters are hard-coded in
-`hw/block/femu/ftl/ftl.c`, please change them accordingly and re-compile FEMU.
+We now test the functionality of CVSS and CV-Manager:
 
-Boot the VM using the following
-script:
+- First, we can find the code of CV-Manager (cv_manager.py) under `/home/femu/f2fs` and the user-level tool under `/home/femu/f2fs-tools`.
+- Second, we can issue some workloads to the system. Below is an example:
+    ```bash
+    sudo fio --randrepeat=1 --ioengine=libaio --direct=1 --name=test --bs=16k --iodepth=128 --readwrite=randwrite  --size=10G --filename=/mnt/nvme0n1/test1.fio
+    ```
+    Note that the filename atttribute is the mount point of the device, instead of /dev/nvme0n1.
+- Third, the logical capacity of CVSS can be adjusted online by issuing:
+    ```bash
+    sudo /home/femu/f2fs/reduction_with_parameter.out 118
+    ```
+    The parameter (e.g., 118) is the new logical capacity we set for the system.
+    This can also be done by using the file system utility tool.
+    ```bash
+    sudo cvfs.f2fs /dev/nvme0n1 -f /mnt/nvme0n1/resize.tmp -t 118
+    ```
+- Fourth, we can validate the size of the logical capacity by issuing:
+    ```bash
+    df -h /dev/nvme0n1
+    ```
 
-```Bash
-./run-blackbox.sh
-```
+    The new logical size should be shown under the Size field as following.
+    ```bash
+    Filesystem      Size  Used Avail Use% Mounted on
+    /dev/nvme0n1    118G  1.9G  117G   2% /mnt/nvme0n1
+    ```
 
-### 2. Run FEMU as whitebox SSDs (ak.a. ``OpenChannel-SSD`` or ``OCSSD`` mode) ###
+- Fifth, we test the functionality of CVSS after the logical capacity is updated. 
+    ```bash
+    sudo fio --randrepeat=1 --ioengine=libaio --direct=1 --name=test --bs=16k --iodepth=128 --readwrite=randwrite  --size=10G --filename=/mnt/nvme0n1/test2.fio
+    ```
 
-Both OCSSD [Specification
-1.2](http://lightnvm.io/docs/Open-ChannelSSDInterfaceSpecification12-final.pdf)
-and [Specification 2.0](http://lightnvm.io/docs/OCSSD-2_0-20180129.pdf) are
-supported, to run FEMU OCSSD mode:
-
-```Bash
-./run-whitebox.sh
-```
-
-By default, FEMU will run OCSSD in 2.0 mode. To run OCSSD in 1.2, make sure
-``OCVER=1`` is set in the ``run-whitebox.sh``
-
-
-
-Inside the VM, you can play with LightNVM.
-
-
-### 3. Run FEMU without SSD logic emulation (``NoSSD`` mode) ###
-
-```Bash
-./run-nossd.sh
-```
-
-In this ``nossd`` mode, no SSD emulation logic (either blackbox or whitebox
-emulation) will be executed.  Base NVMe specification is supported, and FEMU in
-this case handles IOs as fast as possible. It can be used for basic performance
-benchmarking, as well as fast storage-class memory (SCM, or Intel Optane SSD)
-emulation. 
-
-### 4. Run FEMU as NVMe ZNS (Zoned-Namespace) SSDs (``ZNSSD`` mode) ###
-
-**Notes:** Currently only basic ZNS interface is supported and it can be used
-for development purposes. More features like proper latency emulation,
-controller-level zone mappings to flash chips are work-in-progress.
-
-```Bash
-./run-zns.sh
-```
-
-### Contributing ###
-
-Github [``issue``](https://github.com/ucare-uchicago/FEMU/issues) and [``pull
-request``](https://github.com/ucare-uchicago/FEMU/pulls) are preferred. Do let
-us know if you have any thoughts!
-
-### Acknowledgement ###
-
-FEMU is inspired by many prior SSD simulators/emulators (SSDSim, FlashSim,
-VSSIM) as well as hardware development platforms (OpenSSD, DFC), but FEMU has
-gone far beyond what prior platforms can achieve in terms of ``performance``,
-``extensibility``, and ``usability``.
-
-FEMU's NVMe controller logic is based on QEMU/NVMe, LightNVM/QEMU and ZNS/QEMU.
-
-
-## For more details, please checkout the [Wiki](https://github.com/ucare-uchicago/femu/wiki)!
+    We now should find the file (test2.fio) under the directory `/mnt/nvme0n1/`.
+- Sixth, the monitor of bad capacity and the adjustment of the logical capacity can be automated by CV-Manager:
+    ```bash
+    sudo /home/femu/f2fs/cv_manager.py
+    ```
 
