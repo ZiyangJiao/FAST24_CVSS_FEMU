@@ -11,7 +11,7 @@ Contact: Ziyang Jiao (zjiao04@syr.edu), Xiangqun Zhang (xiangq84@syr.edu)
 - [4. Preparing the VM image (skip for AE)](#4-preparing-the-vm-image-skip-for-artifact-evaluation-committe)
 - [5. Starting the virtual machine](#5-starting-the-virtual-machine)
 - [6. Connecting into the virtual machine](#6-connecting-into-the-virtual-machine)
-- [7. Setting up CV-SSDCV-SSD](#7-setting-up-cv-ssd)
+- [7. Setting up CV-SSD](#7-setting-up-cv-ssd)
 - [8. FIO experiments on CVSSD](#8-fio-experiments-on-cvssd-without-logical-capacity-adjustment)
 - [9. FIO experiments on CVSS (CV-FS+CV-SSD+CV-Manager)](#9-fio-experiments-on-cvss-cv-fscv-ssdcv-manager)
 
