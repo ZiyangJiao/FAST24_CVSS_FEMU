@@ -70,7 +70,7 @@ This will start the virtual machine (based on QEMU). You can set the path to you
 
 Although the terminal shows an operable console for the virtual machine, it has some limitations. For example, there are no highlights for the terminal. Using Ctrl-C could terminate the virtual machine directly instead of terminating the process running under the virtual machine. Therefore, we have an extra SSH port to connect to the virtual machine for better usability. 
 
-To connect to the virtual machine, please run:
+To connect to the virtual machine, please run on another teminal:
 ```bash
 ssh femu@localhost -p 8080
 ```
