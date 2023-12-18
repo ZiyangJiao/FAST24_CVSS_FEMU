@@ -34,6 +34,6 @@ sudo x86_64-softmmu/qemu-system-x86_64 \
     -net user,hostfwd=tcp::8080-:22 \
     -net nic,model=virtio \
     -nographic \
-    -virtfs local,path=/home/zjiao04,mount_tag=host0,security_model=passthrough,id=host0 \
+    -virtfs local,path=/media/tmp_nvme4/hostshare,mount_tag=host0,security_model=passthrough,id=host0 \
     -device virtio-9p-pci,fsdev=host0,mount_tag=hostshare \
     -qmp unix:./qmp-sock,server,nowait 2>&1 | tee log
