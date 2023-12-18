@@ -54,7 +54,7 @@ You can either build your own VM image, or use the VM image provided by us
 **Option 2**: To build your own VM image, please refer to the [FEMU instructions](https://github.com/vtess/FEMU).
 
 ## 5. Starting the virtual machine
-We first copy the pre-configured disk imgae to the current directory (FAST24_CVSS_FEMU/build-femu):
+We first copy the pre-configured disk imgae to the current directory (`FAST24_CVSS_FEMU/build-femu`):
 ```bash
 cp /media/tmp_nvme4/u20s.qcow2.FAST24AE ./u20s.qcow2.FAST24AE
 ```
