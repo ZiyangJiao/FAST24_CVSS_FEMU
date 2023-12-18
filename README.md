@@ -125,7 +125,7 @@ To enable capacity variance, please refer to the following section.
 We now test the functionality of CV-FS:
 
 - First, the CV-FS code can be found under the directory `/home/femu/linux-5.15.0-76-generic-f2fs`.
-- Second _(skip for AE)_, we can complie CV-FS using the run.sh script under this directory. This step can be skipped since the provided image has done it.
+- Second _(**skip for AE**)_, we can complie CV-FS using the run.sh script under this directory. This step can be skipped since the provided image has done it.
     ```bash
     sudo ./run.sh
     ```
