@@ -56,7 +56,7 @@ You can either build your own VM image, or use the VM image provided by us
 ## 5. Starting the virtual machine
 We first copy the pre-configured disk imgae to the current directory (FAST24_CVSS_FEMU/build-femu):
 ```bash
-cp /media/tmp_nvme4 ./u20s.qcow2.FAST24AE
+cp /media/tmp_nvme4/u20s.qcow2.FAST24AE ./u20s.qcow2.FAST24AE
 ```
 
 To start the virtual machine, please run:
