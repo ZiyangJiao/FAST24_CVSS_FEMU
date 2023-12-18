@@ -73,7 +73,7 @@ If there is a prompt for the password, simply use _femu_ as password.
 
 We use fio as an example here to test the functionality of CV-SSD:
 
-- First, we check the status of the emulated deivce (/dev/nvme0n1) by issuing lsblk command. We should find the emulated deivce with ~120GiB capacity as below.
+- First, we check the status of the emulated deivce (/dev/nvme0n1) by issuing `lsblk` command. We should find the emulated deivce with ~120GiB capacity as below.
 
     ```bash
     femu@fvm:~$ lsblk 
@@ -125,10 +125,16 @@ To enable capacity variance, please refer to the following section.
 We now test the functionality of CV-FS:
 
 - First, the CV-FS code can be found under the directory `/home/femu/linux-5.15.0-76-generic-f2fs`.
-- Second _(optional)_, we can complie CV-FS using the run.sh script under this directory. This step can be skipped since the provided image has done it.
-`sudo ./run.sh`
+- Second _(skip for AE)_, we can complie CV-FS using the run.sh script under this directory. This step can be skipped since the provided image has done it.
+    ```bash
+    sudo ./run.sh
+    ```
+    
 - Third, we build CV-FS on CV-SSD. This can be done by running:
-`diskcvfs`
+    ```bash
+    inscvfs
+    diskcvfs
+    ```
 This command will build the file system and mount the CV-SSD on the path `/mnt/nvme0n1`. It also create directories for the experiments.
 - Fourth, we can check the status of the system using `lsblk`. We should find the device is mounted successfully and ready to use. Below is an example:
 
