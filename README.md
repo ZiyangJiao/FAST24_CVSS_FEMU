@@ -80,6 +80,7 @@ We first copy the pre-configured disk imgae to the current directory (`working_d
 ```bash
 cp /media/tmp_nvme4/fast24ae/u20s.qcow2.FAST24AE ./u20s.qcow2.FAST24AE
 ```
+The pre-configured disk imgae has installed all necessary modules and dependencies for the experiments, including our kernel level modification (https://github.com/ZiyangJiao/FAST24_CVSS_Kernel) and CV-FS (https://github.com/ZiyangJiao/FAST24_CVSS_CVFS).
 
 To start the virtual machine, please run:
 ```bash
