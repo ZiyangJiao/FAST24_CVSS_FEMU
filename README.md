@@ -35,7 +35,7 @@ ssh zjiao04@ecs-linux.syr.edu -p 10500
 ```
 The password is _Jzy1998!_
 
-Then we can connect into out lab machine:
+Then we can connect into our lab machine:
 ```bash
 ssh fast24ae@128.230.208.139
 ```
@@ -43,7 +43,7 @@ The password is _fast24ae_
 
 ## 2. Downloading the repository
 
-Please make sure to create your working directory first under /media/tmp_nvme4/fast24ae/ directory:
+Please make sure to **create your working directory** first under /media/tmp_nvme4/fast24ae/ directory:
 ```bash
 cd /media/tmp_nvme4/fast24ae/
 mkdir reviewer1
