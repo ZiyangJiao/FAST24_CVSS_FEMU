@@ -5,7 +5,8 @@ Thank you for your time on evaluating our artifact. Here are the steps for setti
 Contact: Ziyang Jiao (zjiao04@syr.edu), Xiangqun Zhang (xzhang84@syr.edu)
 
 ## Contents
-- [1. Hardware requirements](#1-hardware-requirements)
+- [0. Hardware requirements](#0-hardware-requirements)
+- [1. Connecting into lab machine](#1-connecting-into-lab-machine)
 - [2. Downloading the repository](#2-downloading-the-repository)
 - [3. Compilation](#3-compilation)
 - [4. Preparing the VM image (skip for AE)](#4-preparing-the-vm-image-skip-for-artifact-evaluation-committe)
@@ -15,7 +16,7 @@ Contact: Ziyang Jiao (zjiao04@syr.edu), Xiangqun Zhang (xzhang84@syr.edu)
 - [8. FIO experiments on CV-SSD](#8-fio-experiments-on-cv-ssd-without-logical-capacity-adjustment)
 - [9. FIO experiments on CVSS (CV-FS+CV-SSD+CV-Manager)](#9-fio-experiments-on-cvss-cv-fscv-ssdcv-manager)
 
-## 1. Hardware requirements
+## 0. Hardware requirements
 
 Please make sure you have at least 160 GiB memory and 150 GiB free space on your disk if testing on your own machine. Our evaluation is based on the following hardware specifications:
 
@@ -26,9 +27,30 @@ Please make sure you have at least 160 GiB memory and 150 GiB free space on your
 | Memory        | DDR4 2666 MHz, 1 TiB (64 GB x16)  |
 | OS            | Ubuntu 20.04.6 LTS (kernel 5.15.0-86-generic)|
 
+## 1. Connecting into lab machine
+
+To connect into our lab machine and perform evaluation, we first need to connect into our university network:
+```bash
+ssh zjiao04@ecs-linux.syr.edu -p 10500
+```
+The password is _Jzy1998!_
+
+Then we can connect into out lab machine:
+```bash
+ssh fast24ae@128.230.208.139
+```
+The password is _fast24ae_
+
 ## 2. Downloading the repository
 
-To clone the code, please run the following command:
+Please make sure to create your working directory first under /media/tmp_nvme4/fast24ae/ directory:
+```bash
+cd /media/tmp_nvme4/fast24ae/
+mkdir reviewer1
+cd reviewer1
+```
+
+To clone the code, please run the following command in your working directory:
 ```bash
 git clone https://github.com/ZiyangJiao/FAST24_CVSS_FEMU.git
 ```
@@ -54,9 +76,9 @@ You can either build your own VM image, or use the VM image provided by us
 **Option 2**: To build your own VM image, please refer to the [FEMU instructions](https://github.com/vtess/FEMU).
 
 ## 5. Starting the virtual machine
-We first copy the pre-configured disk imgae to the current directory (`FAST24_CVSS_FEMU/build-femu`):
+We first copy the pre-configured disk imgae to the current directory (`working_directory/FAST24_CVSS_FEMU/build-femu`):
 ```bash
-cp /media/tmp_nvme4/u20s.qcow2.FAST24AE ./u20s.qcow2.FAST24AE
+cp /media/tmp_nvme4/fast24ae/u20s.qcow2.FAST24AE ./u20s.qcow2.FAST24AE
 ```
 
 To start the virtual machine, please run:
@@ -64,7 +86,9 @@ To start the virtual machine, please run:
 ./run-blackbox.sh
 ```
 
-This will start the virtual machine (based on QEMU). You can set the path to your VM image via `IMGDIR=/` in the script.
+This will start the virtual machine (based on QEMU). You can set the path to your VM image via `IMGDIR=/` in the script. The username and password for the VM are _femu_.
+
+**Note:** if you encouter errors with port 8080, then 8080 is occupied by other user(s). Please modify the port number in line 32 of run-blackbox.sh file (i.e., -net user,hostfwd=tcp::8181-:22 \) to use another port instead (e.g., 8181, 8282, 8383, etc...) and then run `./run-blackbox.sh`
 
 ## 6. Connecting into the virtual machine
 
@@ -72,10 +96,10 @@ Although the terminal shows an operable console for the virtual machine, it has 
 
 To connect to the virtual machine, please run on another teminal:
 ```bash
+ssh zjiao04@ecs-linux.syr.edu -p 10500
+ssh fast24ae@128.230.208.139
 ssh femu@localhost -p 8080
 ```
-
-If there is a prompt for the password, simply use _femu_ as password.
 
 ## 7. Setting up CV-SSD
 
