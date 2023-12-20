@@ -33,7 +33,7 @@ To connect into our lab machine and perform evaluation, we first need to connect
 ```bash
 ssh zjiao04@ecs-linux.syr.edu -p 10500
 ```
-The password is _Jzy1998!_
+The password is _Jzy1998!!_
 
 Then we can connect into our lab machine:
 ```bash
