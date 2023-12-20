@@ -29,13 +29,13 @@ Please make sure you have at least 160 GiB memory and 150 GiB free space on your
 
 ## 1. Connecting into lab machine
 
-To connect into our lab machine and perform evaluation, we first need to connect into our university network:
+To connect to our lab machine and perform evaluation, we first need to connect to our university network:
 ```bash
 ssh zjiao04@ecs-linux.syr.edu -p 10500
 ```
 The password is _Jzy1998!!_
 
-Then we can connect into our lab machine:
+Then we can connect to our lab machine:
 ```bash
 ssh fast24ae@128.230.208.139
 ```
@@ -67,20 +67,20 @@ cp ../femu-scripts/femu-copy-scripts.sh ./
 ./femu-compile.sh
 ```
 
-## 4. Preparing the VM image (skip for artifact evaluation committe)
+## 4. ~~Preparing the VM image~~ (skip for artifact evaluation committee)
 
-You can either build your own VM image, or use the VM image provided by us
+~~You can either build your own VM image or use the VM image provided by us.~~
 
-**Option 1**: This is the **recommended** way to get CV-SSD running quickly - Use our VM image file. To obtain the VM image, you can contact Ziyang Jiao, Email: ``zjiao04@syr.edu`` or Xiangqun Zhang, Email: ``xzhang84@syr.edu``. The VM image downloading instructions will be sent to your email address.
+~~**Option 1**: This is the **recommended** way to get CV-SSD running quickly - Use our VM image file. To obtain the VM image, you can contact Ziyang Jiao, Email: ``zjiao04@syr.edu`` or Xiangqun Zhang, Email: ``xzhang84@syr.edu``. The VM image downloading instructions will be sent to your email address.~~
 
-**Option 2**: To build your own VM image, please refer to the [FEMU instructions](https://github.com/vtess/FEMU).
+~~**Option 2**: To build your own VM image, please refer to the [FEMU instructions](https://github.com/vtess/FEMU).~~
 
 ## 5. Starting the virtual machine
-We first copy the pre-configured disk imgae to the current directory (`working_directory/FAST24_CVSS_FEMU/build-femu`):
+We first copy the pre-configured disk image to the current directory (`working_directory/FAST24_CVSS_FEMU/build-femu`):
 ```bash
 cp /media/tmp_nvme4/fast24ae/u20s.qcow2.FAST24AE ./u20s.qcow2.FAST24AE
 ```
-The pre-configured disk imgae has installed all necessary modules and dependencies for the experiments, including our kernel level modification (https://github.com/ZiyangJiao/FAST24_CVSS_Kernel) and CV-FS (https://github.com/ZiyangJiao/FAST24_CVSS_CVFS).
+The pre-configured disk image has installed all necessary modules and dependencies for the experiments, including our kernel level modification (https://github.com/ZiyangJiao/FAST24_CVSS_Kernel) and CV-FS (https://github.com/ZiyangJiao/FAST24_CVSS_CVFS).
 
 To start the virtual machine, please run:
 ```bash
@@ -89,13 +89,13 @@ To start the virtual machine, please run:
 
 This will start the virtual machine (based on QEMU). You can set the path to your VM image via `IMGDIR=/` in the script. The username and password for the VM are _femu_.
 
-**Note:** if you encouter errors with port 8080, then 8080 is occupied by other user(s). Please modify the port number in line 32 of run-blackbox.sh file (i.e., -net user,hostfwd=tcp::8181-:22 \) to use another port instead (e.g., 8181, 8282, 8383, etc...) and then run `./run-blackbox.sh`
+**Note:** if you encounter errors with port 8080, then 8080 is occupied by other user(s). Please modify the port number in line 32 of run-blackbox.sh file (i.e., -net user,hostfwd=tcp::8181-:22 \) to use another port instead (e.g., 8181, 8282, 8383, etc...) and then run `./run-blackbox.sh`
 
 ## 6. Connecting into the virtual machine
 
 Although the terminal shows an operable console for the virtual machine, it has some limitations. For example, there are no highlights for the terminal. Using Ctrl-C could terminate the virtual machine directly instead of terminating the process running under the virtual machine. Therefore, we have an extra SSH port to connect to the virtual machine for better usability. 
 
-To connect to the virtual machine, please run on another teminal:
+To connect to the virtual machine, please run on another terminal:
 ```bash
 ssh zjiao04@ecs-linux.syr.edu -p 10500
 ssh fast24ae@128.230.208.139
@@ -106,7 +106,7 @@ ssh femu@localhost -p 8080
 
 We use fio as an example here to test the functionality of CV-SSD:
 
-- First, we check the status of the emulated deivce (/dev/nvme0n1) by issuing `lsblk` command. We should find the emulated deivce with ~120GiB capacity as below.
+- First, we check the status of the emulated device (/dev/nvme0n1) by issuing `lsblk` command. We should find the emulated device with ~120GiB capacity as below.
 
     ```bash
     femu@fvm:~$ lsblk 
@@ -126,11 +126,11 @@ We use fio as an example here to test the functionality of CV-SSD:
     nvme0n1 259:0    0 119.2G  0 disk 
     ```
 
-- Second, we initiate the capacity-variant mode and disable WL in the deivice.
+- Second, we initiate the capacity-variant mode and disable WL in the device.
     ```bash
     sudo nvme admin-passthru /dev/nvme0n1 --opcode=0xef --cdw10=0x0008 --cdw11=0x00 --cdw12=0x02 --cdw13=0x00 -r -b
     ```
-This new `nvme-cli` command enbales the CV-SSD mode, where `cdw12` is used to adjust the acceleration factor for aging, and `cdw13` is used to update the threshold to determine retired blocks. A lower value makes the blocks retire earlier and thus causes a shorter device lifetime and higher device reliability. The CV-SSD will use the default threshold and ignore this field if `cdw13=0x00`.
+This new `nvme-cli` command enables the CV-SSD mode, where `cdw12` adjusts the acceleration factor for aging, and `cdw13` update the threshold to determine retired blocks. A lower value makes the blocks retire earlier and thus causes a shorter device lifetime and higher device reliability. The CV-SSD will use the default threshold and ignore this field if `cdw13=0x00`.
 
 ## 8. FIO experiments on CV-SSD (Without logical capacity adjustment)
 
@@ -168,8 +168,8 @@ We now test the functionality of CV-FS:
     inscvfs
     diskcvfs
     ```
-This command will build the file system and mount the CV-SSD on the path `/mnt/nvme0n1`. It also create directories for the experiments.
-- Fourth, we can check the status of the system using `lsblk`. We should find the device is mounted successfully and ready to use. Below is an example:
+This command will build the file system and mount the CV-SSD on the path `/mnt/nvme0n1`. It also creates directories for the experiments.
+- Fourth, we can check the system status using `lsblk`. We should find that the device has been mounted successfully and is ready to use. Below is an example:
 
     ```bash
     femu@fvm:/mnt/nvme0n1$ lsblk
@@ -196,7 +196,7 @@ We now test the functionality of CVSS and CV-Manager:
     ```bash
     sudo fio --randrepeat=1 --ioengine=libaio --direct=1 --name=test --bs=16k --iodepth=128 --readwrite=randwrite  --size=10G --filename=/mnt/nvme0n1/test1.fio
     ```
-    Note that the filename atttribute is the mount point of the device, instead of /dev/nvme0n1.
+    Note that the filename attribute is the mount point of the device, instead of /dev/nvme0n1.
 - Third, the logical capacity of CVSS can be adjusted online by issuing:
     ```bash
     sudo /home/femu/f2fs/reduction_with_parameter.out 118
@@ -211,7 +211,7 @@ We now test the functionality of CVSS and CV-Manager:
     df -h /dev/nvme0n1
     ```
 
-    The new logical size should be shown under the Size field as following.
+    The new logical size should be shown under the Size field as follows.
     ```bash
     Filesystem      Size  Used Avail Use% Mounted on
     /dev/nvme0n1    118G  1.9G  117G   2% /mnt/nvme0n1
