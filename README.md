@@ -33,13 +33,12 @@ To connect to our lab machine and perform evaluation, we first need to connect t
 ```bash
 ssh zjiao04@ecs-linux.syr.edu -p 10500
 ```
-The password is _Jzy1998!!_
 
 Then we can connect to our lab machine:
 ```bash
 ssh fast24ae@128.230.208.139
 ```
-The password is _fast24ae_
+The passwords are included in the submission page.
 
 ## 2. Downloading the repository
 
@@ -87,7 +86,9 @@ To start the virtual machine, please run:
 ./run-blackbox.sh
 ```
 
-This will start the virtual machine (based on QEMU). You can set the path to your VM image via `IMGDIR=/` in the script. The username and password for the VM are _femu_.
+This will start the virtual machine (based on QEMU). You can set the path to your VM image via `IMGDIR=/` in the script. 
+
+**The username and password for the VM are _femu_**
 
 **Note:** if you encounter errors with port 8080, then 8080 is occupied by other user(s). Please modify the port number in line 32 of run-blackbox.sh file (i.e., -net user,hostfwd=tcp::8080-:22 \) to use another port instead (e.g., 8181, 8282, 8383, etc...) and then run `./run-blackbox.sh`
 
