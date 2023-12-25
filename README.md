@@ -38,7 +38,7 @@ Then we can connect to our lab machine:
 ```bash
 ssh fast24ae@128.230.208.139
 ```
-The passwords are included in the submission page.
+**The passwords are included in the submission page**.
 
 ## 2. Downloading the repository
 
