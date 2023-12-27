@@ -101,7 +101,7 @@ To connect to the virtual machine, please run on another terminal:
 ```bash
 ssh zjiao04@ecs-linux.syr.edu -p 10500
 ssh fast24ae@128.230.208.139
-ssh femu@localhost -p 8080
+ssh femu@localhost -p 8080(or the modified port number)
 ```
 
 ## 7. Setting up CV-SSD
