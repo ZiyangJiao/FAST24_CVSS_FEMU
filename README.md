@@ -1,5 +1,6 @@
 # FAST ’24 Artifacts Evaluation
-Thank you for your time on evaluating our artifact. Here are the steps for setting up the FEMU for CVSSD.
+Thank you for your time on evaluating our artifact. Here are the steps for setting up the FEMU for CVSSD. 
+We target Available and Functional flag because full experiments will take serveral months.
 
 ## Title: The Design and Implementation of a Capacity-Variant Storage System
 Contact: Ziyang Jiao (zjiao04@syr.edu), Xiangqun Zhang (xzhang84@syr.edu)
