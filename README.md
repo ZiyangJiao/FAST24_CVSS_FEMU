@@ -212,7 +212,7 @@ We now test the functionality of CVSS and CV-Manager:
     df -h /dev/nvme0n1
     ```
 
-    The new logical size should be shown under the Size field as follows.
+    The new logical size should be shown under the Size field similar as follows.
     ```bash
     Filesystem      Size  Used Avail Use% Mounted on
     /dev/nvme0n1    118G  1.9G  117G   2% /mnt/nvme0n1
