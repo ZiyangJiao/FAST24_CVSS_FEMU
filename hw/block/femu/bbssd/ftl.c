@@ -660,7 +660,7 @@ static inline int get_read_retry_cnt(struct nand_block *blk, struct ssdparams *s
     return read_retry;
 }
 
-static uint64_t ssd_gc_read(struct ssd *ssd, struct ppa *ppa, struct nand_cmd *ncmd)
+static uint64_t ssd_gc_read(struct ssd *ssd, struct ppa *ppa, struct nand_cmd *ncmd) // proactively relocate read heavy data
 {
     // return 0;
     if ((ssd->lm.lines[ppa->g.blk]).read_cnt < 1000) {
@@ -680,7 +680,7 @@ static uint64_t ssd_gc_read(struct ssd *ssd, struct ppa *ppa, struct nand_cmd *n
         // printf("READ0: is aged\n");
         struct line_mgmt *lm = &ssd->lm;
         struct ppa ppa_tmp;
-        uint64_t line_cur_read = 0, line_read = 0, line_max_read = 0;
+        uint64_t line_cur_read = 0, line_read = 0;
         int line_read_min_id = -1;
         int line_read_min_ec = -1;
         int i, ch, lun;
@@ -695,9 +695,6 @@ static uint64_t ssd_gc_read(struct ssd *ssd, struct ppa *ppa, struct nand_cmd *n
             struct line *line = &lm->lines[i];
             blk_tmp = get_blk(ssd, &ppa_tmp);
             line_read = line->read_cnt;
-            if (line_read > line_max_read) {
-            	line_max_read = line_read;
-            }
             // printf("READ0: get line read\n");
             // for (ch = 0; ch < spp->nchs; ch++) {
             //     ppa_tmp.g.ch = ch;
@@ -734,7 +731,7 @@ static uint64_t ssd_gc_read(struct ssd *ssd, struct ppa *ppa, struct nand_cmd *n
         // printf("READ1: line_cur_read = %ld, line_avg_read %ld, line_read_min_ec %d\n", line_cur_read, line_avg_read, line_read_min_ec);
 
         // check if target is a read-heavy (super)block
-        if (line_cur_read > line_avg_read && line_cur_read > 0.3*line_max_read && line_read_min_id != -1) {
+        if (line_cur_read > line_avg_read && line_read_min_id != -1) {
             //check benefit
             // printf("READ2: check benefit\n");
             if (swap_is_benefit(blk->erase_cnt, line_read_min_ec, spp)) {
@@ -1123,8 +1120,8 @@ static struct line *select_victim_line(struct ssd *ssd, bool force)
     struct line *victim_line = NULL;
     struct ssdparams *spp = &ssd->sp;
     int total_vpc = lm->full_line_cnt * spp->pgs_per_line;
-    // double line_score = -1.0;
-    // double line_score_tmp = -1.0;
+    double line_score = -1.0;
+    double line_score_tmp = -1.0;
 
    if (lm->free_line_cnt < 5) { // avoid empty free pool because of too many bad lines
         struct line *line = NULL;
@@ -1156,6 +1153,9 @@ static struct line *select_victim_line(struct ssd *ssd, bool force)
         if (!victim_line) {
             return NULL;
         }
+        if ((ssd->sp).acceleration > 5) {
+            goto gotit;
+        }
         total_vpc += victim_line->vpc;
 
         /* CV victim selection policy */
@@ -1170,20 +1170,20 @@ static struct line *select_victim_line(struct ssd *ssd, bool force)
             ppa.g.pl = 0;
             ppa.g.blk = victim_line->id;
             struct nand_block *block_victim = get_blk(ssd, &ppa);
-            // line_score = victim_line->ipc/spp->pgs_per_line*0.4 + 0.3*block_victim->erase_cnt/spp->endurance;
+            // line_score = victim_line->ipc/spp->pgs_per_line*0.2 + 0.6*block_victim->erase_cnt/spp->endurance;
             for (int i = 1; i < lm->victim_line_cnt; i++) {
                 line = lm->victim_line_pq->d[i + 1]; // d[1] is the result of peek(), we check the rest.
                 ppa.g.blk = line->id;
                 block_tmp = get_blk(ssd, &ppa);
                 total_vpc += line->vpc;
 
-                // line_score_tmp = line->ipc/spp->pgs_per_line*0.4 + 0.3*block_tmp->erase_cnt/spp->endurance;
-                // if (line_score_tmp > line_score && line->vpc < ssd->sp.pgs_per_line / 8) {
+                // line_score_tmp = line->ipc/spp->pgs_per_line*0.2 + 0.6*block_tmp->erase_cnt/spp->endurance;
+                // if (line_score_tmp > line_score) {
                 //     victim_line = line;
                 //     block_victim = block_tmp;
                 //     line_score = line_score_tmp;
-                //	continue;
                 // }
+
                 // /***
                 if (line->vpc > victim_line->vpc) {
                     continue;
@@ -1242,7 +1242,7 @@ static struct line *select_victim_line(struct ssd *ssd, bool force)
     }
 
     if ((ssd->cv_moderate == 0) && (lm->bad_line_cnt > 0) && (victim_line->vpc > ssd->sp.pgs_per_line / 2)){ // If WAF is high, we should turn on CV-moderate to slow capacity loss.
-        ssd->cv_moderate = 1;
+        // ssd->cv_moderate = 1;
     }
 gotit: ;
     pqueue_remove(lm->victim_line_pq, victim_line);
@@ -1379,9 +1379,9 @@ static int do_gc(struct ssd *ssd, bool force)
                 util += line->vpc;
             }
             util = util/((lm->tt_lines - lm->bad_line_cnt)*ssd->sp.pgs_per_line);
-            if (util > 0.75) {
-            //if (util > 0.8) {
-                ssd->cv_moderate = 1;
+            // if (util > 0.75) {
+            if (util > 0.8) {
+                // ssd->cv_moderate = 1;
             }
         }
     } else {
@@ -1504,7 +1504,7 @@ maintainCapacity: ;
     return 0;
 }
 
-static uint64_t do_gc_read(struct ssd *ssd, NvmeRequest *req)
+static uint64_t do_gc_read(struct ssd *ssd, NvmeRequest *req) //different from gc_read_page
 {
     // ftl_log("In ssd_read: ssd_read start!\n");
     struct ssdparams *spp = &ssd->sp;
@@ -1854,9 +1854,9 @@ static void *ftl_thread(void *arg)
                 ftl_err("FTL to_poller enqueue failed\n");
             }
 
-            if (req->cmd.opcode == NVME_CMD_READ) {
-                do_gc_read(ssd, req);
-            }
+            // if (req->cmd.opcode == NVME_CMD_READ) {
+            //     do_gc_read(ssd, req); //then trigger ssd_gc_read, which is different from gc_read_page
+            // }
 
             /* clean one line if needed (in the background) */
         //    if (should_gc(ssd)) {
