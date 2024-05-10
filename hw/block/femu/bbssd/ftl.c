@@ -1120,8 +1120,8 @@ static struct line *select_victim_line(struct ssd *ssd, bool force)
     struct line *victim_line = NULL;
     struct ssdparams *spp = &ssd->sp;
     int total_vpc = lm->full_line_cnt * spp->pgs_per_line;
-    double line_score = -1.0;
-    double line_score_tmp = -1.0;
+    // double line_score = -1.0;
+    // double line_score_tmp = -1.0;
 
    if (lm->free_line_cnt < 5) { // avoid empty free pool because of too many bad lines
         struct line *line = NULL;
@@ -1855,8 +1855,9 @@ static void *ftl_thread(void *arg)
             }
 
             // if (req->cmd.opcode == NVME_CMD_READ) {
-            //     do_gc_read(ssd, req); //then trigger ssd_gc_read, which is different from gc_read_page
-            // }
+            if (false) {
+                do_gc_read(ssd, req); //then trigger ssd_gc_read, which is different from gc_read_page
+            }
 
             /* clean one line if needed (in the background) */
         //    if (should_gc(ssd)) {
